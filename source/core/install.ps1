@@ -6,7 +6,6 @@ function Run() {
 
     # ==== Setup Interfacing Mechanisms ====
     #* Add Macros
-    #* Group Policy
     #* Command and Module Manager
 }
 
