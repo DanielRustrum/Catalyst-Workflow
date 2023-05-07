@@ -33,6 +33,10 @@ function RunIfAdmin() {
 		#* Fetch Latest NeoVim Installer and Install
 		#* Setup NeoVim For Catalyst Use
 
+	#* Check if NeoVim is Installed
+		#* Fetch Tmux for Installation
+		#* Install and Setup For Catalyst Use
+
 	#* Check if Desired PowerToys are Installed
 		#* Install and Setup PowerToys
 	

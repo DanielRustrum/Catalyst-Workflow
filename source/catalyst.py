@@ -37,10 +37,8 @@ def getCommand():
     command_arg = sys.argv[1]
 
     command_action = {
-            "help": _help, 
-        "container": {
-            "start": docker.startContainer
-        } 
+        "help": _help, 
+        "devenv": docker.command 
     }
 
     try:
