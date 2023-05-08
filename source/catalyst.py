@@ -33,25 +33,31 @@ def formatArgs(arg_list):
     return (args, flags)
 
 def getCommand():
-    error = False
-    command_arg = sys.argv[1]
-
-    command_action = {
-        "help": _help, 
-        "devenv": docker.command 
-    }
-
     try:
-        if isinstance(command_action[command_arg], types.FunctionType):
-            return (command_action[command_arg], formatArgs(sys.argv[2:]), error)
-        else:
-            subcommand_arg = sys.argv[2]
-            return (command_action[command_arg][subcommand_arg], formatArgs(sys.argv[3:]), error)
-    except Exception as e:
-        print("Error: Command Doesn't Exist")
-        error = True
+        error = False
+        command_arg = sys.argv[1]
 
-    return (lambda x: None, ([], {}), error)
+        command_action = {
+            "help": _help, 
+            "devenv": docker.command 
+        }
+
+        try:
+            if isinstance(command_action[command_arg], types.FunctionType):
+                return (command_action[command_arg], formatArgs(sys.argv[2:]), error)
+            else:
+                subcommand_arg = sys.argv[2]
+                return (command_action[command_arg][subcommand_arg], formatArgs(sys.argv[2:]), error)
+        except Exception as e:
+            print("Error: Command Doesn't Exist")
+            error = True
+
+        return (lambda x: None, ([], {}), error)
+
+    except TabError:
+        pass
+      #  _help(())
+       # return (lambda x: None, ([], {}), error)
 
 def main():
     command, args, _ = getCommand()

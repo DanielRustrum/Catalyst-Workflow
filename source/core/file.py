@@ -1,10 +1,7 @@
-import yaml
+def dictToYAML(dictionary, path):
+    pass
 
-def convertToYAML(dictionary, path):
-    with open(path, 'w+') as yaml_file:
-        yaml.dump(dictionary, yaml_file, allow_unicode=True)
-
-def fetchYAML(path):
+def YAMLtoDict(path):
     pass
 
 def storeFile(namespace, path):
