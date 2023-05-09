@@ -1,5 +1,9 @@
 import subprocess
 
+def _help(args):
+    with open("./help.txt", 'r') as help_file:
+        print(help_file.read())
+
 def runCommand(cmd, command_type="powershell", detached=False, quiet=False):
     if(command_type == "powershell"):
         if quiet:
@@ -37,52 +41,4 @@ def runCommand(cmd, command_type="powershell", detached=False, quiet=False):
             },
             "process": command_process
         }
-
-def requireArgs(
-        args, 
-        flags=[], 
-        listed_length=0, 
-        flag_error=lambda x:f"{x} is Required", 
-        arg_error=""):
-    errored = False
-    formatted_args = {}
-
-    for flag in flags:
-        try:
-            formatted_args[flag] = args[1][flag]
-        except KeyError:
-            print(f"Key Error: {flag_error(flag)}")
-            errored = True
-
-    if len(args[0]) < listed_length:
-        print(f"Argument Error: {arg_error}")
-        errored = True
-    formatted_args["_"] = args[0]
-
-    return (errored, formatted_args)
-
-def optionalArgs(
-        args, 
-        flags=[], 
-        listed_length=0, 
-        flag_default={},
-        listed_default=[]):
-
-    formatted_args = {}
-    for flag in flags: 
-        try:
-            formatted_args[flag] = args[1][flag]
-        except KeyError:
-            try: 
-                formatted_args[flag] = flag_default[flag]
-            except KeyError: 
-                formatted_args[flag] = None
-
-    if len(args[0]) < listed_length:
-        formatted_args["_"] = listed_default
-    else:
-        formatted_args["_"] = args[0]
-    
-    return formatted_args
-
 

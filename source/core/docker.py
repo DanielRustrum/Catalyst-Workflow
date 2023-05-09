@@ -1,41 +1,41 @@
-from . import core, file
+from . import file, core
 import os
 
 #* Interface
 def start(args):
-    errored, req_args = core.requireArgs(args, flags=["name"])
+    arg_map, errored = args.required(flags=["name"]).result()
 
     if errored:
         return
 
     core.runCommand(
-        f"docker compose -f C:/'Program Files'/Catalyst/envs/{req_args['name']}/compose.yaml up --detach",
+        f"docker compose -f C:/'Program Files'/Catalyst/envs/{arg_map['name']}/compose.yaml up --detach",
         detached=True,
         quiet=True
     )
 
 def stop(args):
-    errored, req_args = core.requireArgs(args, flags=["name"])
+    arg_map, errored = args.required(flags=["name"]).result()
 
     if errored:
         return
 
     core.runCommand(
-        f"docker compose -f C:/'Program Files'/Catalyst/envs/{req_args['name']}/compose.yaml down",
+        f"docker compose -f C:/'Program Files'/Catalyst/envs/{arg_map['name']}/compose.yaml down",
         quiet=True
     )
 
 def focus(args):
-    errored, req_args = core.requireArgs(args, flags=["name"])
+    arg_map, errored = args.required(flags=["name"]).result()
 
     if errored:
         return
     
-    core.runCommand(f"docker exec -it {req_args['name']} bash")
+    core.runCommand(f"docker exec -it {arg_map['name']} bash")
 
 def create(args):
-    errored, req_args = core.requireArgs(args, flags=["name"])
-    opt_args = core.optionalArgs(args, flags=[
+    errored, req_args = argsf.requireArgs(args, flags=["name"])
+    opt_args = argsf.optionalArgs(args, flags=[
         "buildFile", 
         "composeFile", 
         "linkRepo",
@@ -68,10 +68,11 @@ services:
 volumes:
     devenv:
 """)
+        
     
 
 def delete(args):
-    errored, req_args = core.requireArgs(args, flags=["name"])
+    errored, req_args = argsf.requireArgs(args, flags=["name"])
 
     if errored:
         return
@@ -85,7 +86,7 @@ def delete(args):
     os.rmdir(f"C:/Program Files/Catalyst/envs/{req_args['name']}")
 
 def file(args):
-    errored, req_args = core.requiredArgs(args, listed_length=3, flags=["name"])
+    errored, req_args = argsf.requiredArgs(args, listed_length=3, flags=["name"])
 
     direction = req_args["_"][0]
     src_path = req_args["_"][1]
@@ -99,11 +100,15 @@ def file(args):
     if direction == "from":
         core.runCommand(f"docker cp {req_args['name']}:{src} {dest}")
 
+def purge(args):
+    pass
+
 command = {
     "start": start,
     "stop": stop,
     "focus": focus,
     "create": create,
     "delete": delete,
-    "file": file
+    "file": file,
+    "purge": purge
 }
