@@ -13,9 +13,10 @@ def getArgs(index_offset = 0):
     listed = []
     exec_flag = []
 
+    pwd = sys.argv[-1]
     interaction_start = INDEX_START + index_offset
 
-    for arg in sys.argv[interaction_start:]:
+    for arg in sys.argv[interaction_start:-1]:
         if arg.startswith("--"):
             split_flag = "".join(arg[2:]).split("=")
 
@@ -44,7 +45,9 @@ def getArgs(index_offset = 0):
     class ArgManager:
         def __init__(self):
             self._ordered_args_length = 0
-            self._arg_map = {}
+            self._arg_map = {
+                "cwd": pwd
+            }
             self._errored = False
             self._optional_declared = False
 
@@ -55,9 +58,9 @@ def getArgs(index_offset = 0):
             for flag in flags:
                 try:
                     self._arg_map[flag] = flagged[flag]
-                except keyerror:
+                except KeyError:
                     print(f"key error: {flag} is required")
-                    self._errored = true
+                    self._errored = True
                     return self
 
             if len(listed) < len(order):
@@ -78,12 +81,14 @@ def getArgs(index_offset = 0):
             for flag in flags.keys():
                 try:
                     self._arg_map[flag] = flagged[flag]
-                except keyerror:
+                except KeyError:
                     self._arg_map[flag] = flags[flag]
 
             for short_flag in short:
                 if short_flag in exec_flag:
                     self._arg_map[short_flag] = True
+                else:
+                    self_arg_map[short_flag] = False
 
             for index, arg in enumerate(order):
                 self._arg_map[arg] = listed[index + self._ordered_args_length]

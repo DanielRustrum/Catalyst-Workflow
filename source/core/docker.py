@@ -1,4 +1,4 @@
-from . import file, core
+from . import data, core
 import os
 
 #* Interface
@@ -34,74 +34,68 @@ def focus(args):
     core.runCommand(f"docker exec -it {arg_map['name']} bash")
 
 def create(args):
-    errored, req_args = argsf.requireArgs(args, flags=["name"])
-    opt_args = argsf.optionalArgs(args, flags=[
-        "buildFile", 
-        "composeFile", 
-        "linkRepo",
-        "isolated"
-    ])
+    arg_map, errored = args\
+            .required(flags=["name"])\
+            .optional(flags={
+                "config": None
+            })\
+            .result()
 
     if errored:
         return
 
+    data.Directory.create(f"C:/Program Files/Catalyst/envs/{arg_map['name']}")
 
-    if not os.path.isdir(f"C:/Program Files/Catalyst/envs/{req_args['name']}"):
-        os.mkdir(f"C:/Program Files/Catalyst/envs/{req_args['name']}")
+    yaml = data.DictToYAML({
+        "version": "3.9",
+        "services": {
+            "devenv": {
+                "image": "ubuntu:latest",
+                "container_name": arg_map["name"],
+                "ports": [
+                    "80:80",
+                    "443: 443"
+                ],
+                "stdin_open": data.Literal("true"),
+                "volumes": [
+                    data.Literal(f"devenv:/root/{arg_map['name']}")
+                ]
+            }
+        },
+        "volumes": {
+            "devenv": {}
+        }
+    })
 
-    if errored:
-        return
-
-    with open(f"C:/Program Files/Catalyst/envs/{req_args['name']}/compose.yaml", "w+") as yaml_file:
-        yaml_file.write(f"""version: "3.9"
-services:
-    devenv:
-        image: "ubuntu:latest"
-        container_name: "{req_args['name']}"
-        ports:
-            - "80:80"
-            - "443:443"
-        stdin_open: true
-        tty: true
-        volumes:
-            - devenv:/root/{req_args['name']}
-volumes:
-    devenv:
-""")
+    data.Files.write(f"C:/Program Files/Catalyst/envs/{arg_map['name']}/compose.yaml", yaml.result)
         
     
 
 def delete(args):
-    errored, req_args = argsf.requireArgs(args, flags=["name"])
+    arg_map, errored = args.required(flags=["name"]).result()
 
     if errored:
         return
 
-    for root, dirs, files in os.walk(f"C:/Program Files/Catalyst/envs/{req_args['name']}"):
-        for name in files:
-            os.remove(os.path.join(root, name))
-        for name in dirs:
-            os.rmdir(os.path.join(root, name))
-
-    os.rmdir(f"C:/Program Files/Catalyst/envs/{req_args['name']}")
+    data.Directory.delete(f"C:/Program Files/Catalyst/envs/{arg_map['name']}")
 
 def file(args):
-    errored, req_args = argsf.requiredArgs(args, listed_length=3, flags=["name"])
-
-    direction = req_args["_"][0]
-    src_path = req_args["_"][1]
-    dest_path = req_args["_"][2]
+    arg_map, errored = args.required(flags=["name"], order=["direction", "src", "dest"]).result()
 
     if errored:
         return
 
-    if direction == "to":
-        core.runCommand(f"docker cp {src} {req_args['name']}:{dest}")
-    if direction == "from":
-        core.runCommand(f"docker cp {req_args['name']}:{src} {dest}")
+    if arg_map['direction'] == "to":
+        core.runCommand(f"docker cp {arg_map['src']} {arg_map['name']}:{arg_map['dest']}")
+    if arg_map['direction'] == "from":
+        core.runCommand(f"docker cp {arg_map['name']}:{arg_map['src']} {arg_map['dest']}")
 
 def purge(args):
-    pass
+    arg_map, errored = args.result()
+    print(data.Store.get(), type(data.Store.get()))
+    data.Store.set({
+        "test": "hello!"
+    })
 
 command = {
     "start": start,
