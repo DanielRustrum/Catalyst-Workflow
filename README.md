@@ -1,2 +1,6 @@
 # Catalyst-Workflow
-A Workflow Integration for Windows that allows for better/easier use of Linux, Windows, and External Computation Systems. 
+Allow you to utilize your system by mapping out your current config setup.
+
+## Actions
+*Use:*
+- path (p): path to catalyst config directory

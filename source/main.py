@@ -1,8 +1,11 @@
-from . import cli
+import cli
 
-def help(args, io):
-    with io("out") as out:
-        out.line("Hello!")
+@cli.action("test", ["Test Arg 1 (Optional)"], {
+    "Test": "Test Flag (Optional)"
+})
+def func1():
+    '''A Test Function Don't Touch'''
 
-cli.addCommand("help", callback=help)
-cli.executeCommand()
+cli.formatCommand()
+cli.setupLogging()
+cli.executeAction()
